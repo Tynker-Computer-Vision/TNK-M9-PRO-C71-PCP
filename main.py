@@ -1,5 +1,9 @@
+import cvzone
 import cv2
+import os
+import math
 from cvzone.HandTrackingModule import HandDetector
+from cvzone.FaceMeshModule import FaceMeshDetector
 import random
 
 cap = cv2.VideoCapture(0)
@@ -36,9 +40,9 @@ while True:
 
     wHeight, wWidth, wChannel = cameraFeedImg.shape
 
-    handsDetector = detector.findHands(cameraFeedImg, flipType=False)
-    hands = handsDetector[0]
-    cameraFeedImg = handsDetector[1]
+    hands, cameraFeedImg = detector.findHands(cameraFeedImg, flipType=False)
+
+    indexFingerTop = 0
 
     if state == "getQuestion":
         # Generate a random equation
@@ -62,13 +66,29 @@ while True:
         state = "getAnswer"
 
     else:
+        cameraFeedImg = cv2.rectangle(
+            cameraFeedImg, (0, 0), (int(wWidth/2), 100), (255, 255, 255), -1)
+        cameraFeedImg = cv2.rectangle(
+            cameraFeedImg, (0, 0), (int(wWidth/2), 100), (0, 0, 0), 2)
+        cameraFeedImg = cv2.rectangle(
+            cameraFeedImg, (int(wWidth/2), 0), (wWidth, 100), (255, 255, 255), -1)
+        cameraFeedImg = cv2.rectangle(
+            cameraFeedImg, (int(wWidth/2), 0), (wWidth, 100), (0, 0, 0), 2)
+        cameraFeedImg = cv2.rectangle(cameraFeedImg, (0, int(
+            wHeight)-100), (int(wWidth/2), wHeight), (255, 0, 0), -1)
+        cameraFeedImg = cv2.rectangle(cameraFeedImg, (0, int(
+            wHeight)-100), (int(wWidth/2), wHeight), (0, 0, 0), 2)
+        cameraFeedImg = cv2.rectangle(cameraFeedImg, (int(
+            wWidth/2), int(wHeight)-100), (wWidth, wHeight), (255, 255, 255), -1)
+        cameraFeedImg = cv2.rectangle(cameraFeedImg, (int(
+            wWidth/2), int(wHeight)-100), (wWidth, wHeight), (0, 0, 0), 2)
 
-        cameraFeedImg = cv2.putText(cameraFeedImg, str(
-            equation), (20, 250), cv2.FONT_HERSHEY_DUPLEX, 1.0, (125, 246, 55), 2)
-        cameraFeedImg = cv2.putText(cameraFeedImg, str(round(option1, 2)), (int(
-            wWidth/4), 50), cv2.FONT_HERSHEY_DUPLEX, 1.0, (125, 246, 55), 2)
-        cameraFeedImg = cv2.putText(cameraFeedImg, str(round(option2, 2)), (int(
-            wWidth/1.5), 50), cv2.FONT_HERSHEY_DUPLEX, 1.0, (125, 246, 55), 2)
+        cameraFeedImg = cv2.putText(cameraFeedImg, "Q: "+str(equation), (30, int(
+            wHeight)-40), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255), 2)
+        cameraFeedImg = cv2.putText(cameraFeedImg, "Option1: "+str(round(
+            option1, 2)), (int(wWidth/8), 50), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 0, 0), 2)
+        cameraFeedImg = cv2.putText(cameraFeedImg, "Option2: "+str(round(
+            option2, 2)), (int(wWidth/1.8), 50), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 0, 0), 2)
 
         try:
             if hands:
@@ -91,10 +111,10 @@ while True:
 
                     if choice == solution:
                         cameraFeedImg = cv2.putText(cameraFeedImg, "Corret!", (int(
-                            wWidth/2.3), int(wHeight/2)), cv2.FONT_HERSHEY_DUPLEX, 1.0, (125, 246, 55), 2)
+                            wWidth/1.5), int(wHeight)-40), cv2.FONT_HERSHEY_DUPLEX, 1.0, (0, 255, 0), 2)
                     else:
                         cameraFeedImg = cv2.putText(cameraFeedImg, "Wrong!", (int(
-                            wWidth/2.3), int(wHeight/2)), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 0, 0), 2)
+                            wWidth/1.5), int(wHeight)-40), cv2.FONT_HERSHEY_DUPLEX, 1.0, (0, 0, 255), 2)
 
                     state = "getQuestion"
                     cv2.imshow("Quiz App", cameraFeedImg)
