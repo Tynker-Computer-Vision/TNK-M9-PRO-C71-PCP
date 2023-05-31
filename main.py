@@ -1,9 +1,5 @@
-import cvzone
 import cv2
-import os
-import math
 from cvzone.HandTrackingModule import HandDetector
-from cvzone.FaceMeshModule import FaceMeshDetector
 import random
 
 cap = cv2.VideoCapture(0)
@@ -40,9 +36,9 @@ while True:
 
     wHeight, wWidth, wChannel = cameraFeedImg.shape
 
-    hands, cameraFeedImg = detector.findHands(cameraFeedImg, flipType=False)
-
-    indexFingerTop = 0
+    handsDetector = detector.findHands(cameraFeedImg, flipType=False)
+    hands = handsDetector[0]
+    cameraFeedImg = handsDetector[1]
 
     if state == "getQuestion":
         # Generate a random equation
